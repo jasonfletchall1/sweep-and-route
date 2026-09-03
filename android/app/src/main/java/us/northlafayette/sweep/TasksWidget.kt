@@ -1,0 +1,125 @@
+package us.northlafayette.sweep
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.widget.RemoteViews
+import android.widget.Toast
+import java.util.concurrent.Executors
+
+class TasksWidget : AppWidgetProvider() {
+
+    companion object {
+        const val ACTION_ITEM = "us.northlafayette.sweep.TASK_ITEM"
+        const val ACTION_REFRESH = "us.northlafayette.sweep.TASKS_REFRESH"
+        const val EXTRA_PAGE_ID = "pageId"
+        const val EXTRA_TASK_NAME = "taskName"
+
+        private val executor = Executors.newSingleThreadExecutor()
+
+        fun pushUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
+            for (id in ids) {
+                val views = RemoteViews(context.packageName, R.layout.widget_tasks)
+
+                val adapterIntent = Intent(context, TasksWidgetService::class.java)
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+                views.setRemoteAdapter(R.id.task_list, adapterIntent)
+                views.setEmptyView(R.id.task_list, R.id.empty_view)
+
+                // Item taps (check-off) arrive as broadcasts filled in by the factory.
+                val template = Intent(context, TasksWidget::class.java).setAction(ACTION_ITEM)
+                views.setPendingIntentTemplate(
+                    R.id.task_list,
+                    PendingIntent.getBroadcast(
+                        context, 0, template,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                    )
+                )
+
+                views.setOnClickPendingIntent(
+                    R.id.btn_refresh,
+                    PendingIntent.getBroadcast(
+                        context, 1,
+                        Intent(context, TasksWidget::class.java).setAction(ACTION_REFRESH),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+                views.setOnClickPendingIntent(
+                    R.id.btn_add,
+                    PendingIntent.getActivity(
+                        context, 2,
+                        Intent(context, CaptureActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+                val allTasks = PendingIntent.getActivity(
+                    context, 3,
+                    Intent(context, AllTasksActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.widget_title, allTasks)
+                views.setOnClickPendingIntent(R.id.all_link, allTasks)
+
+                awm.updateAppWidget(id, views)
+            }
+        }
+
+        private fun refreshData(context: Context) {
+            val awm = AppWidgetManager.getInstance(context)
+            val ids = awm.getAppWidgetIds(ComponentName(context, TasksWidget::class.java))
+            if (ids.isNotEmpty()) awm.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
+        }
+    }
+
+    override fun onUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
+        pushUpdate(context, awm, ids)
+        awm.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        when (intent.action) {
+            ACTION_REFRESH -> refreshData(context)
+            ACTION_ITEM -> {
+                val pageId = intent.getStringExtra(EXTRA_PAGE_ID) ?: return
+                val taskName = intent.getStringExtra(EXTRA_TASK_NAME) ?: ""
+                val token = Prefs.token(context)
+                val doneProp = Prefs.doneProp(context)
+                val result = goAsync()
+                executor.execute {
+                    val handler = Handler(Looper.getMainLooper())
+                    try {
+                        NotionApi.completeTask(token, pageId, doneProp)
+                        handler.post {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.task_done, taskName),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        refreshData(context)
+                    } catch (e: Exception) {
+                        handler.post {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.task_done_failed, e.message ?: ""),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } finally {
+                        result.finish()
+                    }
+                }
+            }
+        }
+    }
+}

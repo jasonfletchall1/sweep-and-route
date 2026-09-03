@@ -1,0 +1,14 @@
+# Android build outputs and local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+
+# Signing — never commit a keystore or its passwords
+*.jks
+*.keystore
+
+# Built artifacts (attached to releases instead)
+*.apk
+*.plugin
+plugin/assets/sweep.apk

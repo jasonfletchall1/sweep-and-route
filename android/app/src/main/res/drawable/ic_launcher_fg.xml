@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Broom in motion (direction C from the icon canvas), composed inside
+         the adaptive-icon circle safe zone. -->
+    <group
+        android:pivotX="57"
+        android:pivotY="54"
+        android:rotation="-16">
+        <path
+            android:pathData="M57,26 L57,56"
+            android:strokeColor="@color/broom_cream"
+            android:strokeLineCap="round"
+            android:strokeWidth="6" />
+        <path
+            android:fillColor="@color/broom_cream"
+            android:pathData="M53,55 L61,55 A2.5,2.5 0 0 1 63.5,57.5 L63.5,62 L50.5,62 L50.5,57.5 A2.5,2.5 0 0 1 53,55 Z" />
+        <path
+            android:fillColor="@color/broom_cream"
+            android:pathData="M49,62 L64.5,62 L69,82 L44.5,82 Z" />
+        <path
+            android:pathData="M51.5,66 L50,78"
+            android:strokeColor="#2861BD"
+            android:strokeLineCap="round"
+            android:strokeWidth="2" />
+        <path
+            android:pathData="M56.5,66 L56.5,78"
+            android:strokeColor="#2861BD"
+            android:strokeLineCap="round"
+            android:strokeWidth="2" />
+        <path
+            android:pathData="M61.5,66 L63,78"
+            android:strokeColor="#2861BD"
+            android:strokeLineCap="round"
+            android:strokeWidth="2" />
+    </group>
+    <path
+        android:pathData="M30,50 L40,49"
+        android:strokeColor="#7CA5EC"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.5" />
+    <path
+        android:pathData="M27,60 L39,59"
+        android:strokeColor="#7CA5EC"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.5" />
+    <path
+        android:pathData="M31,70 L41,69"
+        android:strokeColor="#7CA5EC"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.5" />
+    <path
+        android:fillColor="#7CA5EC"
+        android:pathData="M35,78 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+</vector>

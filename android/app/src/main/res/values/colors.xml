@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- North Lafayette palette (northlafayette.us design tokens) -->
+    <color name="accent">#143B7B</color>          <!-- primary navy, hsl(217 72% 28%) -->
+    <color name="accent_light">#2861BD</color>    <!-- primary-light -->
+    <color name="text">#151C28</color>            <!-- foreground -->
+    <color name="subtext">#6A7181</color>         <!-- muted-foreground -->
+    <color name="overdue">#DC2626</color>         <!-- destructive -->
+    <color name="icon">#454F60</color>
+
+    <color name="screen_bg">#F6F7F9</color>       <!-- background -->
+    <color name="card_bg">#FFFFFF</color>         <!-- card -->
+    <color name="field_bg">#F6F7F9</color>
+    <color name="field_stroke">#DCDFE5</color>    <!-- border -->
+    <color name="btn_text">#FFFFFF</color>
+
+    <color name="widget_bg">#F2FFFFFF</color>
+    <color name="ic_launcher_bg">#143B7B</color>
+    <color name="broom_cream">#F7F3EE</color>
+</resources>
