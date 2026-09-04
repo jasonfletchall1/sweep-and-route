@@ -42,7 +42,12 @@ Optional (ask which they want; skip the matching features cleanly if absent):
   matter — keep them intact.
 - **Linear** → auto-filed issues for software-shaped tasks (ask which team;
   resolve their Linear user ID for assignments — never assign to "me", which
-  can resolve to an integration account)
+  can resolve to an integration account). Also ask whether they have an AI
+  agent user in Linear (a Claude/Cowork agent, an app user their nightly
+  automation picks up) and a label that marks work for it: if so, keep the
+  prompt's `[AGENT]` block filled with that user ID and label, so a capture
+  that explicitly says "have Claude do this" gets assigned there; otherwise
+  delete the block.
 
 ## Step 1 — Notion databases
 

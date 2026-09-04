@@ -14,8 +14,11 @@ Placeholders: `{{USER_NAME}}`, `{{USER_NOTION_ID}}` (person ID for Assignee),
 `{{TASKS_DS}}`, `{{IDEAS_URL}}`/`{{IDEAS_DS}}`, `{{MEETING_NOTES_URL}}`/
 `{{MEETING_NOTES_DS}}`, `{{DRIVE_NOTES_FOLDER}}` (Drive folder name/ID, e.g.
 Gemini's "Meet Recordings"), `{{CALENDAR_EMAIL}}`, `{{TIMEZONE}}`,
-`{{LINEAR_TEAM}}` (team key), `{{LINEAR_USER_ID}}`, `{{DUE_TODAY_VIEW}}`,
-`{{RECENT_VIEW}}` (view:// IDs of the date-windowed views).
+`{{LINEAR_TEAM}}` (team key), `{{LINEAR_USER_ID}}`, `{{LINEAR_AGENT_ID}}`/
+`{{LINEAR_AGENT_LABEL}}` (optional: the AI/agent Linear user and the label
+that marks work for it — keep the `[AGENT]` block only if the user has one),
+`{{DUE_TODAY_VIEW}}`, `{{RECENT_VIEW}}` (view:// IDs of the date-windowed
+views).
 
 ---
 
@@ -128,7 +131,17 @@ the task name; description links back to the Notion task and source;
 assignee = `{{LINEAR_USER_ID}}` (NEVER "me" — that can resolve to an
 integration account); due date mirrors the task. Set the Notion task's
 Linear url property to the issue URL. Work belonging to another team: Notion
-task only, flag it in the report.]
+task only, flag it in the report.
+
+[AGENT: **Delegating to the AI agent.** If the capture or action item
+EXPLICITLY says the work should be done by Claude / the AI (e.g. "have
+Claude do this", "assign to Claude", "Claude can fix this", "AI ticket"),
+assign the issue to `{{LINEAR_AGENT_ID}}` instead and add the
+`{{LINEAR_AGENT_LABEL}}` label; note in the description that it was
+delegated at the user's request in the capture. Only on an explicit
+instruction in the text — never infer it from the work looking easy or
+automatable; the default stays the user, unlabelled. List each delegated
+issue in the report.]]
 
 # Part D — Housekeeping (every run, even if A–C did nothing)
 

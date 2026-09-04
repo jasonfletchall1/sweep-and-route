@@ -1,5 +1,6 @@
 package us.northlafayette.sweep
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -11,6 +12,8 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.RemoteViews
 import android.widget.Toast
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.concurrent.Executors
 
 class TasksWidget : AppWidgetProvider() {
@@ -18,6 +21,7 @@ class TasksWidget : AppWidgetProvider() {
     companion object {
         const val ACTION_ITEM = "us.northlafayette.sweep.TASK_ITEM"
         const val ACTION_REFRESH = "us.northlafayette.sweep.TASKS_REFRESH"
+        const val ACTION_MIDNIGHT = "us.northlafayette.sweep.TASKS_MIDNIGHT"
         const val EXTRA_PAGE_ID = "pageId"
         const val EXTRA_TASK_NAME = "taskName"
 
@@ -78,17 +82,66 @@ class TasksWidget : AppWidgetProvider() {
             val ids = awm.getAppWidgetIds(ComponentName(context, TasksWidget::class.java))
             if (ids.isNotEmpty()) awm.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
         }
+
+        private fun midnightIntent(context: Context): PendingIntent =
+            PendingIntent.getBroadcast(
+                context, 4,
+                Intent(context, TasksWidget::class.java).setAction(ACTION_MIDNIGHT),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        /**
+         * "Due today" depends on the local calendar day, and Android's
+         * updatePeriodMillis timer is best-effort (skipped in Doze, throttled
+         * by launchers), so the day boundary gets its own alarm. Inexact +
+         * allow-while-idle needs no special permission, and the PendingIntent
+         * is reused, so calling this repeatedly just re-arms the same alarm.
+         */
+        fun scheduleMidnightRefresh(context: Context) {
+            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val next = LocalDate.now().plusDays(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .plusMinutes(1)
+            am.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                next.toInstant().toEpochMilli(),
+                midnightIntent(context)
+            )
+        }
+
+        private fun cancelMidnightRefresh(context: Context) {
+            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            am.cancel(midnightIntent(context))
+        }
     }
 
     override fun onUpdate(context: Context, awm: AppWidgetManager, ids: IntArray) {
         pushUpdate(context, awm, ids)
         awm.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
+        // Alarms don't survive a reboot; onUpdate does run after one.
+        scheduleMidnightRefresh(context)
+    }
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        scheduleMidnightRefresh(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        cancelMidnightRefresh(context)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         when (intent.action) {
             ACTION_REFRESH -> refreshData(context)
+            ACTION_MIDNIGHT,
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_TIME_CHANGED -> {
+                refreshData(context)
+                scheduleMidnightRefresh(context)
+            }
             ACTION_ITEM -> {
                 val pageId = intent.getStringExtra(EXTRA_PAGE_ID) ?: return
                 val taskName = intent.getStringExtra(EXTRA_TASK_NAME) ?: ""

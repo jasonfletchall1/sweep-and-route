@@ -53,8 +53,9 @@ captures); without it, any two databases shaped like that will work.
 
 ## Notes
 
-- The tasks widget auto-refreshes every ~30 minutes; the ↻ button refreshes
-  immediately. Checking a task off updates Notion right away.
+- The tasks widget auto-refreshes every ~30 minutes and again right after
+  midnight, so the new day's tasks appear without a tap; the ↻ button
+  refreshes immediately. Checking a task off updates Notion right away.
 - "Due today" shows tasks whose due date is today **or earlier** (overdue shows
   in red). Tasks with no due date only appear in the `All ›` list.
 - Voice capture: the first time you tap the mic, Sweep asks how you want to

@@ -1,6 +1,6 @@
 {
   "name": "sweep-and-route",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Universal capture system: dump thoughts into a Notion Inbox from anywhere (including one-tap Android widgets), and a scheduled Claude sweep classifies and routes them to Tasks, Ideas, Google Calendar, meeting agendas, and Linear. Includes a setup skill that builds the Notion databases, schedules the sweep, and walks through the Android app install.",
   "author": {
     "name": "Jason Fletchall"

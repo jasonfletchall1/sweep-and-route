@@ -16,36 +16,62 @@ class TasksWidgetService : RemoteViewsService() {
 
 private class TasksFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
 
+    private val lock = Any()
     private var tasks: List<NotionApi.Task> = emptyList()
+
+    /**
+     * The local calendar day the current [tasks] list was fetched for. The
+     * launcher keeps this factory alive across days and may rebind to it
+     * without calling [onDataSetChanged] (e.g. after the periodic
+     * APPWIDGET_UPDATE re-supplies the layout), so anything served from
+     * [tasks] must be checked against today's date first — otherwise the
+     * widget keeps showing the list from the day it was last refreshed.
+     */
+    private var loadedFor: LocalDate? = null
 
     override fun onCreate() {}
 
     override fun onDataSetChanged() {
         // Runs on a binder thread, so a synchronous fetch is fine here.
-        tasks = if (Prefs.tasksReady(context)) {
-            try {
-                NotionApi.openTasks(
-                    Prefs.token(context),
-                    Prefs.tasksDbId(context),
-                    Prefs.doneProp(context),
-                    Prefs.dueProp(context),
-                    dueOnOrBefore = LocalDate.now().toString()
-                )
-            } catch (e: Exception) {
-                emptyList()
-            }
-        } else {
-            emptyList()
-        }
+        load(force = true)
     }
 
     override fun onDestroy() {}
 
-    override fun getCount(): Int = tasks.size
+    override fun getCount(): Int {
+        // Self-heal: if the day rolled over since the last fetch, re-query
+        // before reporting anything, even though nobody asked for a refresh.
+        load(force = false)
+        return synchronized(lock) { tasks.size }
+    }
+
+    private fun load(force: Boolean) = synchronized(lock) {
+        val today = LocalDate.now()
+        if (!force && loadedFor == today) return
+        if (!Prefs.tasksReady(context)) {
+            tasks = emptyList()
+            loadedFor = today
+            return
+        }
+        try {
+            tasks = NotionApi.openTasks(
+                Prefs.token(context),
+                Prefs.tasksDbId(context),
+                Prefs.doneProp(context),
+                Prefs.dueProp(context),
+                dueOnOrBefore = today.toString()
+            )
+        } catch (e: Exception) {
+            // A transient failure keeps the list fetched earlier today; once
+            // the day has changed, stale rows are worse than an empty list.
+            if (loadedFor != today) tasks = emptyList()
+        }
+        loadedFor = today
+    }
 
     override fun getViewAt(position: Int): RemoteViews {
-        val task = tasks[position]
         val row = RemoteViews(context.packageName, R.layout.widget_task_item)
+        val task = synchronized(lock) { tasks.getOrNull(position) } ?: return row
         row.setTextViewText(R.id.task_name, task.name)
 
         val (label, overdue) = dueLabel(task.due)
