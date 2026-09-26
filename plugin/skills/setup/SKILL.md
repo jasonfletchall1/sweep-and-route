@@ -1,13 +1,13 @@
 ---
 name: setup
-description: Set up the Sweep and Route capture system for this user — create or adopt the Notion Inbox/Tasks/Ideas databases, schedule the recurring Claude sweep, and optionally install the Sweep Android widgets app. Use when the user says "set up sweep and route", "sweep setup", "onboard me to sweep", "install the sweep system", or asks how to get the inbox/sweep/widgets working on their account.
+description: Set up the Sweep and Route capture system for this user — create or adopt the Notion Inbox/Tasks/Ideas databases, schedule the recurring Claude sweep, and optionally install the Sweep phone widgets app (Android APK or iOS TestFlight). Use when the user says "set up sweep and route", "sweep setup", "onboard me to sweep", "install the sweep system", or asks how to get the inbox/sweep/widgets working on their account.
 ---
 
 # Sweep and Route — setup
 
 You are onboarding a user onto Sweep and Route: one Notion Inbox for
 zero-friction capture, a scheduled Claude sweep that classifies and routes
-captures, and (optionally) Android home-screen widgets. Run the steps in
+captures, and (optionally) Android/iOS home-screen widgets. Run the steps in
 order, confirming with the user at each decision point. Everything is created
 in THEIR accounts — never reuse IDs, URLs, or tokens from these instructions'
 author or any example.
@@ -113,16 +113,22 @@ raises, so future automatic runs never pause waiting for approval. Describe
 the schedule to them as "checks your inbox every half hour during the day" —
 not as cron.
 
-## Step 3 — Android widgets app (optional)
+## Step 3 — Phone widgets app (optional)
 
-The signed APK ships in this plugin at `assets/sweep.apk` (also
-`assets/ANDROID.md` with the full app README). If the user wants it:
+Ask which phone the user has. **Android:** the signed APK ships in this
+plugin at `assets/sweep.apk` (also `assets/ANDROID.md` with the full app
+README). **iPhone:** the iOS app is distributed through TestFlight — see
+`assets/IOS.md` for the current invite link and the install steps; it needs
+iOS 17 or later. The Notion-connection step (2 below) is identical on both.
+If the user wants it:
 
-1. Get the APK and ANDROID.md into the user's hands with whatever
-   file-delivery this session has — send them as files in the conversation
-   if a send-file tool exists, otherwise copy them to the user's outputs
-   folder and say where they are. They need the APK reachable from their
-   phone (chat attachment, Drive, email to self — their choice).
+1. **Android:** get the APK and ANDROID.md into the user's hands with
+   whatever file-delivery this session has — send them as files in the
+   conversation if a send-file tool exists, otherwise copy them to the
+   user's outputs folder and say where they are. They need the APK reachable
+   from their phone (chat attachment, Drive, email to self — their choice).
+   **iPhone:** give them the TestFlight link from `assets/IOS.md` (they
+   install Apple's TestFlight app first if they don't have it).
 2. **Notion connection for the app** — the app needs a Notion connection
    token. There is NO Notion API for creating connections, so this is a
    click-through step in Notion's **developer portal** (reachable from the
@@ -141,10 +147,12 @@ The signed APK ships in this plugin at `assets/sweep.apk` (also
      anywhere, never store it.**
    If a browser-control tool is available and the user asks, you may drive
    the clicks with them watching — but the token step stays theirs.
-3. Sideload: copy the APK to the phone, tap to install (allow "install
-   unknown apps" once), open Sweep, paste token → Load databases → pick the
-   Inbox and Tasks databases and the Done/Due properties → Save → add the two
-   widgets from the launcher's widget picker.
+3. Install: **Android** — copy the APK to the phone, tap to install (allow
+   "install unknown apps" once). **iPhone** — open the TestFlight link, tap
+   Install. Then on either: open Sweep, paste token → Load databases → pick
+   the Inbox and Tasks databases and the Done/Due properties → Save → add the
+   two Sweep widgets (Android: launcher widget picker; iPhone: long-press the
+   home screen → + → search "Sweep").
 
 ## Step 4 — Recap
 
