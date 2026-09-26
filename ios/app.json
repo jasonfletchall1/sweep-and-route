@@ -17,7 +17,8 @@
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "appleTeamId": "HYFN9PQ33R"
     },
     "plugins": [
       "@bacons/apple-targets",
@@ -29,6 +30,29 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "bundleIdentifier": "us.northlafayette.sweep.widgets",
+                  "targetName": "SweepWidgets",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.us.northlafayette.sweep"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "fa42c71b-04f9-4717-aedd-d069c20c3e46"
+      }
+    },
+    "owner": "jasonfletchall1"
   }
 }
