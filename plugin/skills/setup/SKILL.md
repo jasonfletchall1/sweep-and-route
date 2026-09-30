@@ -40,7 +40,9 @@ Optional (ask which they want; skip the matching features cleanly if absent):
   - **None** — Parts B/C are dropped entirely; the Inbox sweep still works.
   If they pick more than one source, the prompt's cross-source dedup rules
   matter — keep them intact.
-- **Linear** → auto-filed issues for software-shaped tasks (ask which team;
+- **Linear** → auto-filed issues for software-shaped tasks, and the linked
+  Notion task is checked off automatically once its issue is Done or
+  Canceled (ask which team;
   resolve their Linear user ID for assignments — never assign to "me", which
   can resolve to an integration account). Also ask whether they have an AI
   agent user in Linear (a Claude/Cowork agent, an app user their nightly

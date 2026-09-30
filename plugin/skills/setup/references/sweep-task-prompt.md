@@ -145,10 +145,20 @@ issue in the report.]]
 
 # Part D — Housekeeping (every run, even if A–C did nothing)
 
-1. **Stamp completions**: Tasks rows with Done checked and Completed on
-   empty → set date:Completed on:start = today (is_datetime=0). Never change
-   Done yourself; never re-stamp.
-2. **Roll date-windowed views** (connector filters take fixed ISO dates
+[LINEAR: 1. **Close tasks whose Linear issue is done**: query Tasks for
+   Done = FALSE AND Linear url is not empty. For each row, look up the
+   linked issue (by the identifier in the URL). If the issue is Done or
+   Canceled (any completed-type or canceled-type workflow state), check
+   Done on the task and set date:Completed on:start = today
+   (is_datetime=0). Exception: an issue closed as a Duplicate (state named
+   "Duplicate", or marked duplicate of another issue) does NOT check the
+   task — list it in the report so the user can decide. If the lookup fails
+   (deleted issue, bad URL, team you can't read), leave the task alone and
+   flag it. Linear is READ-ONLY in this step: never change the issue.]
+2. **Stamp completions**: Tasks rows with Done checked and Completed on
+   empty → set date:Completed on:start = today (is_datetime=0). [LINEAR:
+   Apart from step 1,] never change Done yourself; never re-stamp.
+3. **Roll date-windowed views** (connector filters take fixed ISO dates
    only): {{DUE_TODAY_VIEW}} → Done = FALSE AND Due <= today, sorted by Due;
    {{RECENT_VIEW}} → Status = "Filed" AND Captured >= today minus 7 days.
 
@@ -156,7 +166,8 @@ issue in the report.]]
 
 Four-line summary: (A) items filed by type + Needs-decision count; (B)
 meetings synced per source; (C) action items routed / skipped; (D)
-completions stamped, views rolled.
+[LINEAR: tasks closed because their Linear issue is done or canceled
+(+ duplicate or unreadable issues flagged),] completions stamped, views rolled.
 
 Constraints: only create/edit inside the user's own Notion workspace
 [LINEAR: and the {{LINEAR_TEAM}} Linear team]. Meeting-notes sources are

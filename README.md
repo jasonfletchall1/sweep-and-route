@@ -15,7 +15,7 @@ and [Claude](https://claude.com), with optional Android home-screen widgets:
    - ideas → an **Ideas** database
    - scheduled commitments → your **Google Calendar** *(optional)*
    - meeting agenda topics → the matching meeting's notes page *(optional)*
-   - software work → **Linear** issues *(optional)*
+   - software work → **Linear** issues *(optional; the task checks itself off when the issue is Done or Canceled)*
    - action items from your meeting notes — **Granola**, **Gemini** notes via
      Google Drive, or similar — → Tasks *(optional)*
 3. **See it** — the Sweep Android app puts a live "due today" widget on your
